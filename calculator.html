@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Calculator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f3f4f6;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calc {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 260px;
+    }
+
+    .display {
+      background: black;
+      color: white;
+      height: 50px;
+      font-size: 24px;
+      padding: 10px;
+      text-align: right;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 6px;
+      border: none;
+      background: #e5e7eb;
+      cursor: pointer;
+    }
+
+    .span-two {
+      grid-column: span 2;
+    }
+
+    button[data-action="clear"] {
+      background: #ef4444;
+      color: white;
+    }
+
+    button[data-action="equals"] {
+      background: #f59e0b;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="calc">
+    <div id="display" class="display">0</div>
+
+    <div class="keys">
+      <button data-action="clear">C</button>
+      <button data-action="back">←</button>
+      <button data-value="%">%</button>
+      <button data-value="/">/</button>
+
+      <button data-value="7">7</button>
+      <button data-value="8">8</button>
+      <button data-value="9">9</button>
+      <button data-value="*">*</button>
+
+      <button data-value="4">4</button>
+      <button data-value="5">5</button>
+      <button data-value="6">6</button>
+      <button data-value="-">-</button>
+
+      <button data-value="1">1</button>
+      <button data-value="2">2</button>
+      <button data-value="3">3</button>
+      <button data-value="+">+</button>
+
+      <button class="span-two" data-value="0">0</button>
+      <button data-value=".">.</button>
+      <button data-action="equals">=</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    let expr = "";
+
+    function update() {
+      display.textContent = expr || "0";
+    }
+
+    function safeEval(exp) {
+      const allowed = /^[0-9+\-*/%.() ]+$/;
+      if (!allowed.test(exp)) throw "Invalid";
+      return Function("return " + exp)();
+    }
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.value;
+        const action = btn.dataset.action;
+
+        if (action === "clear") {
+          expr = "";
+          update();
+          return;
+        }
+
+        if (action === "back") {
+          expr = expr.slice(0, -1);
+          update();
+          return;
+        }
+
+        if (action === "equals") {
+          try {
+            expr = String(safeEval(expr));
+          } catch {
+            expr = "Error";
+          }
+          update();
+          return;
+        }
+
+        expr += v;
+        update();
+      });
+    });
+  </script>
+
+</body>
+</html>
